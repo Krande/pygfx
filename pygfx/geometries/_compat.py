@@ -28,7 +28,7 @@ def geometry_from_trimesh(mesh):
     kwargs = dict(
         positions=np.ascontiguousarray(mesh.vertices, dtype="f4"),
         indices=np.ascontiguousarray(mesh.faces, dtype="i4"),
-        normals=np.ascontiguousarray(mesh.vertex_normals, dtype="f4"),
+        # normals=np.ascontiguousarray(mesh.vertex_normals, dtype="f4"),
     )
     if mesh.visual.kind == "texture":
         # convert the uv coordinates from opengl to wgpu conventions.
@@ -36,10 +36,11 @@ def geometry_from_trimesh(mesh):
         # the coordinate origin is in the upper left corner, while the opengl coordinate
         # origin is in the lower left corner.
         # trimesh loads textures according to the opengl coordinate system.
-        wgpu_uv = mesh.visual.uv * np.array([1, -1]) + np.array(
-            [0, 1]
-        )  # uv.y = 1 - uv.y
-        kwargs["texcoords"] = np.ascontiguousarray(wgpu_uv, dtype="f4")
+        if mesh.visual.uv is not None:
+            wgpu_uv = mesh.visual.uv * np.array([1, -1]) + np.array(
+                [0, 1]
+            )  # uv.y = 1 - uv.y
+            kwargs["texcoords"] = np.ascontiguousarray(wgpu_uv, dtype="f4")
     elif mesh.visual.kind == "vertex":
         kwargs["colors"] = np.ascontiguousarray(mesh.visual.vertex_colors, dtype="f4")
 
